@@ -9,32 +9,61 @@ import axios from "axios";
 class UploadButtons extends Component {
   constructor() {
     super();
+    this.state = {
+      previewImageUrl: false,
+      imageHeight: 200,
+      imagePrediction: "",
+    };
+    this.generatePreviewImageUrl = this.generatePreviewImageUrl.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.uploadHandler = this.uploadHandler.bind(this);
   }
-  state = {
-    // Initially, no file is selected
-    selectedFile: null,
-  };
-  // On file select (from the pop up)
-  onFileChange = (event) => {
-    // Update the state
-    this.setState({ selectedFile: event.target.files[0] });
-  };
-  // On file upload (click the upload button)
-  onFileUpload = () => {
-    // Create an object of formData
+
+  // Function for previewing the chosen image
+  generatePreviewImageUrl(file, callback) {
+    const reader = new FileReader();
+    const url = reader.readAsDataURL(file);
+    reader.onloadend = (e) => callback(reader.result);
+  }
+
+  // Event handler when image is chosen
+  handleChange(event) {
+    const file = event.target.files[0];
+
+    // If the image upload is cancelled
+    if (!file) {
+      return;
+    }
+
+    this.setState({ imageFile: file });
+    this.generatePreviewImageUrl(file, (previewImageUrl) => {
+      this.setState({
+        previewImageUrl,
+        imagePrediction: "",
+      });
+    });
+  }
+
+  // Function for sending image to the backend
+  uploadHandler(e) {
+    var self = this;
     const formData = new FormData();
-    // Update the formData object
-    formData.append(
-      "myFile",
-      this.state.selectedFile,
-      this.state.selectedFile.name
-    );
-    // Details of the uploaded file
-    console.log(this.state.selectedFile);
-    // Request made to the backend api
-    // Send formData object
-    axios.post("api/uploadfile", formData);
-  };
+    formData.append("file", this.state.imageFile, "img.png");
+
+    var t0 = performance.now();
+    axios
+      .post("https://jsonplaceholder.typicode.com/users", formData)
+      .then(function (response, data) {
+        data = response.data;
+        self.setState({ imagePrediction: data });
+        var t1 = performance.now();
+        console.log(
+          "The time it took to predict the image " +
+            (t1 - t0) +
+            " milliseconds."
+        );
+      });
+  }
   render() {
     return (
       <div>
@@ -43,18 +72,16 @@ class UploadButtons extends Component {
           id="contained-button-file"
           multiple
           type="file"
-          onChange={this.onFileChange}
+          onChange={this.handleChange}
         />
-        <label htmlFor="contained-button-file">
-          <Button
-            variant="contained"
-            color="primary"
-            component="span"
-            onClick={this.onFileUpload}
-          >
-            Upload
-          </Button>
-        </label>
+        <Button
+          variant="contained"
+          color="primary"
+          component="span"
+          onClick={this.uploadHandler}
+        >
+          Upload
+        </Button>
         <label htmlFor="icon-button-file">
           <IconButton
             color="primary"
@@ -64,7 +91,15 @@ class UploadButtons extends Component {
             <PhotoCamera />
           </IconButton>
         </label>
-        <div className="imgPreview"></div>
+        <div className="imgPreview">
+          {this.state.previewImageUrl && (
+            <img
+              height={this.state.imageHeight}
+              alt=""
+              src={this.state.previewImageUrl}
+            />
+          )}
+        </div>
       </div>
     );
   }
