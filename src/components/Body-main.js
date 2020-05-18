@@ -4,7 +4,7 @@ import UploadButtons from "./UploadButtons";
 import LinearDeterminate from "./LinearDeterminate";
 import ContainedButtons from "./ContainedButtons";
 import axios from "axios";
-import { Button, Radio } from 'antd';
+
 
 export default class Body extends Component {
   constructor(props) {
@@ -44,7 +44,7 @@ export default class Body extends Component {
               <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
             </div>
             
-             
+           
             <div>
               <ContainedButtons images={this.state.images}/>
               <Button 
