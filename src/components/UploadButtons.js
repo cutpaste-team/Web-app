@@ -1,4 +1,3 @@
-import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
@@ -18,18 +17,15 @@ class UploadButtons extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.uploadHandler = this.uploadHandler.bind(this);
   }
-
   // Function for previewing the chosen image
   generatePreviewImageUrl(file, callback) {
     const reader = new FileReader();
     const url = reader.readAsDataURL(file);
     reader.onloadend = (e) => callback(reader.result);
   }
-
   // Event handler when image is chosen
   handleChange(event) {
     const file = event.target.files[0];
-
     // If the image upload is cancelled
     if (!file) {
       return;
@@ -43,7 +39,6 @@ class UploadButtons extends Component {
       });
     });
   }
-
   // Function for sending image to the backend
   uploadHandler(e) {
     var self = this;
@@ -51,17 +46,18 @@ class UploadButtons extends Component {
     formData.append("file", this.state.imageFile, "img.png");
 
     var t0 = performance.now();
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
     axios
-      .post("https://jsonplaceholder.typicode.com/users", formData)
-      .then(function (response, data) {
-        data = response.data;
-        self.setState({ imagePrediction: data });
-        var t1 = performance.now();
-        console.log(
-          "The time it took to predict the image " +
-            (t1 - t0) +
-            " milliseconds."
-        );
+      .post("http://09eecc97.ngrok.io", formData, config)
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
       });
   }
   render() {
