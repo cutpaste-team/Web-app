@@ -1,19 +1,22 @@
 import React, { Component } from "react";
 import "./css/Body.css";
-import Box from "@material-ui/core/Box";
-import { Row, Col } from "antd";
 import UploadButtons from "./UploadButtons";
 import LinearDeterminate from "./LinearDeterminate";
 import ContainedButtons from "./ContainedButtons";
 import axios from "axios";
+import { Button, Radio } from 'antd';
 
 export default class Body extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      images: "",
+      images: "", // image show in the border
+      result: false,
+      upload: true,
+      resultImage: "" //image get from API
     };
     this.getDatas = this.getDatas.bind(this);
+    this.getBack = this.getBack.bind(this);
   }
   getDatas() {
     try {
@@ -26,21 +29,31 @@ export default class Body extends Component {
     } catch (error) {
       console.log(error);
     }
+    this.setState({result: true, upload: false});
+
+  }
+  getBack(){
+    this.setState({result: false, upload: true});
   }
   render() {
     return (
       <div className="Body">
-        <Row /**3 border cut, paste, process bar */>
-          <Col span={7}>
-            <UploadButtons></UploadButtons>
-          </Col>
-          <Col span={10}>
-            <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
-          </Col>
-          <Col span={7}>
-            <ContainedButtons images={this.state.images} />
-          </Col>
-        </Row>
+            
+            <div>
+              <UploadButtons></UploadButtons>
+              <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
+            </div>
+            
+             
+            <div>
+              <ContainedButtons images={this.state.images}/>
+              <Button 
+                type="primary" 
+                 size="default"
+                onClick={this.getBack}
+              >Try another image</Button>
+            </div>
+            
       </div>
     );
   }

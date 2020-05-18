@@ -1,10 +1,33 @@
+
 .imgPreview {
   text-align: center;
   margin: 10px auto !important;
-  height: 400px;
-  width: 400px;
-  border-left: 1px solid gray;
-  border-right: 1px solid gray;
-  border-top: 5px solid gray;
-  border-bottom: 5px solid gray;
+  height: 20em;
+  width: 20em;
+  border-left: 1px solid rgba(var(--b3f,250,250,250),1);
+  border-right: 1px solid rgba(var(--b3f,250,250,250),1);
+  border-top: 5px solid rgba(var(--b3f,250,250,250),1);
+  border-bottom: 5px solid rgba(var(--b3f,250,250,250),1);
+  background-color: rgba(var(--b3f,250,250,250),1);
+}
+
+
+
+
+.ant-upload-list-item{
+ width: 20em;
+  margin: 10px auto !important;
+}
+
+.body-test{
+  text-align: center;
+  margin: 10px auto !important;
+}
+
+.paste-icon{
+  margin-left: 2em;
+}
+
+.dowload-paste{
+  margin-top: 2em;
 }

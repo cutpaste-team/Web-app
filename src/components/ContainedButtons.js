@@ -1,27 +1,28 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
+import { Button, Radio } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { CopyOutlined } from '@ant-design/icons';
 import "./css/Upload.css";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    "& > *": {
-      margin: theme.spacing(1),
-    },
-  },
-}));
+
 
 export default function ContainedButtons() {
-  const classes = useStyles();
-
+  
+  const size = "default";
   return (
-    <div className={classes.root}>
-      <Button variant="contained" color="primary">
-        Download
-      </Button>
-      <Button variant="contained" color="secondary">
-        Paste
-      </Button>
+    <div className= "dowload-paste">  
+        <Button type="primary"
+         icon={<DownloadOutlined />}
+          size={size}>
+          Download
+        </Button>
+        
+        <Button type="danger"
+         icon={<CopyOutlined />} 
+         size={size}
+          className="paste-icon">
+          Paste
+        </Button>
       <div className="imgPreview"></div>
     </div>
   );

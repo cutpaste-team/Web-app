@@ -1,9 +1,10 @@
-import Button from "@material-ui/core/Button";
+import { Button, Radio } from 'antd';
 import IconButton from "@material-ui/core/IconButton";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import "./css/Upload.css";
 import React, { Component } from "react";
 import axios from "axios";
+import { notification, Space } from 'antd';
 
 class UploadButtons extends Component {
   constructor() {
@@ -12,6 +13,7 @@ class UploadButtons extends Component {
       previewImageUrl: false,
       imageHeight: 200,
       imagePrediction: "",
+      uploadButton: false
     };
     this.generatePreviewImageUrl = this.generatePreviewImageUrl.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -25,6 +27,15 @@ class UploadButtons extends Component {
   }
   // Event handler when image is chosen
   handleChange(event) {
+    const openNotificationWithIcon = type => {
+      notification[type]({
+        message: 'Notification',
+        description:
+          'Uploaded success',
+      });
+    };
+    this.setState({uploadButton: true});
+    openNotificationWithIcon('success');
     const file = event.target.files[0];
     // If the image upload is cancelled
     if (!file) {
@@ -41,6 +52,7 @@ class UploadButtons extends Component {
   }
   // Function for sending image to the backend
   uploadHandler(e) {
+   
     var self = this;
     const formData = new FormData();
     formData.append("file", this.state.imageFile, "img.png");
@@ -60,7 +72,9 @@ class UploadButtons extends Component {
         console.log(error);
       });
   }
+  
   render() {
+    
     return (
       <div>
         <input
@@ -70,29 +84,33 @@ class UploadButtons extends Component {
           type="file"
           onChange={this.handleChange}
         />
-        <Button
-          variant="contained"
-          color="primary"
-          component="span"
-          onClick={this.uploadHandler}
-        >
-          Upload
-        </Button>
-        <label htmlFor="icon-button-file">
-          <IconButton
-            color="primary"
-            aria-label="upload picture"
-            component="span"
-          >
-            <PhotoCamera />
-          </IconButton>
-        </label>
+        
+        <div className="upload-icon">
+          {this.state.uploadButton && <Button
+           type="primary"
+            size="default"
+            disable="true"
+            onClick={this.uploadHandler}>
+            Upload
+          </Button>}
+          <label htmlFor="icon-button-file">
+            <IconButton
+              color="primary"
+              aria-label="upload picture"
+              component="span"
+            >
+              <PhotoCamera />
+            </IconButton>
+          </label>
+        </div>
         <div className="imgPreview">
           {this.state.previewImageUrl && (
             <img
               height={this.state.imageHeight}
               alt=""
               src={this.state.previewImageUrl}
+              width={280}
+              height={270}
             />
           )}
         </div>
