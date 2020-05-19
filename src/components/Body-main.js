@@ -4,7 +4,7 @@ import UploadButtons from "./UploadButtons";
 import LinearDeterminate from "./LinearDeterminate";
 import ContainedButtons from "./ContainedButtons";
 import axios from "axios";
-
+import { Button } from "antd";
 
 export default class Body extends Component {
   constructor(props) {
@@ -13,7 +13,7 @@ export default class Body extends Component {
       images: "", // image show in the border
       result: false,
       upload: true,
-      resultImage: "" //image get from API
+      resultImage: "", //image get from API
     };
     this.getDatas = this.getDatas.bind(this);
     this.getBack = this.getBack.bind(this);
@@ -29,31 +29,25 @@ export default class Body extends Component {
     } catch (error) {
       console.log(error);
     }
-    this.setState({result: true, upload: false});
-
+    this.setState({ result: true, upload: false });
   }
-  getBack(){
-    this.setState({result: false, upload: true});
+  getBack() {
+    this.setState({ result: false, upload: true });
   }
   render() {
     return (
       <div className="Body">
-            
-            <div>
-              <UploadButtons></UploadButtons>
-              <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
-            </div>
-            
-           
-            <div>
-              <ContainedButtons images={this.state.images}/>
-              <Button 
-                type="primary" 
-                 size="default"
-                onClick={this.getBack}
-              >Try another image</Button>
-            </div>
-            
+        <div>
+          <UploadButtons></UploadButtons>
+          <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
+        </div>
+
+        <div>
+          <ContainedButtons images={this.state.images} />
+          <Button type="primary" size="default" onClick={this.getBack}>
+            Try another image
+          </Button>
+        </div>
       </div>
     );
   }

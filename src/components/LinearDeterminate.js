@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Button, Radio } from 'antd';
+import { Button, Radio } from "antd";
 import "./css/cutbtn.css";
-import { ScissorOutlined } from '@ant-design/icons';
+import { ScissorOutlined } from "@ant-design/icons";
 class LinearDeterminate extends Component {
   render() {
     return (
@@ -9,7 +9,7 @@ class LinearDeterminate extends Component {
         <Button
           type="primary"
           size="default"
-          icon={<ScissorOutlined />} 
+          icon={<ScissorOutlined />}
           onClick={this.props.onclick}
         >
           Cut
