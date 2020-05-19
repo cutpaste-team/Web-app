@@ -64,7 +64,7 @@ class UploadButtons extends Component {
       },
     };
     axios
-      .post("http://09eecc97.ngrok.io", formData, config)
+      .post("http://127.0.0.1:5000/upload", formData, config)
       .then(function (response) {
         console.log(response);
       })

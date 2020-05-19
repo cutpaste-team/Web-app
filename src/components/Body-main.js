@@ -18,14 +18,15 @@ export default class Body extends Component {
     this.getDatas = this.getDatas.bind(this);
     this.getBack = this.getBack.bind(this);
   }
-  getDatas() {
+  async getDatas() {
     try {
-      const dataImage = axios.get(
-        "https://express-demo-heroku.herokuapp.com/api/books"
+      const dataImage = await axios.get(
+        "http://localhost:5000/get-cut-image"
       );
       this.setState({
-        images: dataImage.data,
-      });
+          images: dataImage.data,
+        });
+      console.log(this.state.images);
     } catch (error) {
       console.log(error);
     }
@@ -47,12 +48,7 @@ export default class Body extends Component {
            
             <div>
               <ContainedButtons images={this.state.images}/>
-              <Button 
-                type="primary" 
-                 size="default"
-                onClick={this.getBack}
-              >Try another image</Button>
-            </div>
+              </div>
             
       </div>
     );
