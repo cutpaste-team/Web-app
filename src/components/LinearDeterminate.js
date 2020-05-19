@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Radio } from "antd";
+import { Button } from "antd";
 import "./css/cutbtn.css";
 import { ScissorOutlined } from "@ant-design/icons";
 class LinearDeterminate extends Component {

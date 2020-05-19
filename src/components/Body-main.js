@@ -4,7 +4,6 @@ import UploadButtons from "./UploadButtons";
 import LinearDeterminate from "./LinearDeterminate";
 import ContainedButtons from "./ContainedButtons";
 import axios from "axios";
-import { Button } from "antd";
 
 export default class Body extends Component {
   constructor(props) {
@@ -18,10 +17,10 @@ export default class Body extends Component {
     this.getDatas = this.getDatas.bind(this);
     this.getBack = this.getBack.bind(this);
   }
-  getDatas() {
+  async getDatas() {
     try {
-      const dataImage = axios.get(
-        "https://express-demo-heroku.herokuapp.com/api/books"
+      const dataImage = await axios.get(
+        "http://19c1d9e0.ngrok.io/get-cut-image"
       );
       this.setState({
         images: dataImage.data,
@@ -43,10 +42,10 @@ export default class Body extends Component {
         </div>
 
         <div>
-          <ContainedButtons images={this.state.images} />
-          <Button type="primary" size="default" onClick={this.getBack}>
-            Try another image
-          </Button>
+          <ContainedButtons
+            images={this.state.images}
+            result={this.state.result}
+          />
         </div>
       </div>
     );
