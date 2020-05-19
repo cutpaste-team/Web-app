@@ -74,7 +74,7 @@ class ContainedButtons extends Component {
           />
           <img
             className="picture"
-            src={this.state.url}
+            src={this.props.images}
             width={100}
             height={100}
             alt=""
