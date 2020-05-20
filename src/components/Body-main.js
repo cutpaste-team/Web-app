@@ -5,7 +5,6 @@ import LinearDeterminate from "./LinearDeterminate";
 import ContainedButtons from "./ContainedButtons";
 import axios from "axios";
 
-
 export default class Body extends Component {
   constructor(props) {
     super(props);
@@ -13,7 +12,7 @@ export default class Body extends Component {
       images: "", // image show in the border
       result: false,
       upload: true,
-      resultImage: "" //image get from API
+      resultImage: "", //image get from API
     };
     this.getDatas = this.getDatas.bind(this);
     this.getBack = this.getBack.bind(this);
@@ -30,11 +29,10 @@ export default class Body extends Component {
     } catch (error) {
       console.log(error);
     }
-    this.setState({result: true, upload: false});
-
+    this.setState({ result: true, upload: false });
   }
-  getBack(){
-    this.setState({result: false, upload: true});
+  getBack() {
+    this.setState({ result: false, upload: true });
   }
   render() {
     return (

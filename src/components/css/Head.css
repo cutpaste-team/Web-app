@@ -8,10 +8,13 @@
   );
   height: 50px;
   align-items: center;
+  justify-content: center;
 }
 .Head .Logo {
-  color: cadetblue;
+  color: rebeccapurple;
+  float: left;
+  flex-grow: 1;
 }
 .Head .Contact {
-  float: right;
+  padding: 20px;
 }
