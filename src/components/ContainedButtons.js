@@ -19,24 +19,22 @@ class ContainedButtons extends Component {
     this.downloadImg = this.downloadImg.bind(this);
   }
   downloadImg() {
-    fetch("localhost:5000/download", {
-      method: "GET",
-      headers: {},
-    })
-      .then((res) => {
-        res.arrayBuffer().then(function (buffer) {
-          const url = window.URL.createObjectURL(new Blob([buffer]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "image.png"); //or any other extension
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        });
+    axios
+      .get("http://localhost:5000/download", {
+        responseType: "arraybuffer",
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "image.png"); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+      })
+      .catch((error) => console.log(error));
   }
   onChange(value) {
     this.setState({
