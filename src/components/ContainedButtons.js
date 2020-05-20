@@ -7,6 +7,7 @@ import Bg2 from "../images/Bg-2.png";
 import Bg3 from "../images/Bg-3.png";
 import Bg4 from "../images/Bg-4.png";
 import Bg5 from "../images/Bg-5.png";
+import axios from "axios";
 
 class ContainedButtons extends Component {
   constructor(props) {
@@ -20,38 +21,39 @@ class ContainedButtons extends Component {
     this.setState({
       url: value,
     });
+    const file = value;
+    const formData = new FormData();
+    formData.append("file", file);
+    for (var value of formData.values()) {
+      console.log(value);
+    }
+    const config = {
+      headers: {
+        "Contetnt-Type": "multipart/form-data",
+      },
+    };
+    axios
+      .post("localhost:5000/merge", formData, config)
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
   render() {
     const size = "default";
     const { Option } = Select;
-
-    function onBlur() {
-      console.log("blur");
-    }
-
-    function onFocus() {
-      console.log("focus");
-    }
-
-    function onSearch(val) {
-      console.log("search:", val);
-    }
     return (
       <div className="dowload-paste">
         <Space>
           {" "}
-          <Button type="primary" icon={<DownloadOutlined />} size={size}>
-            Download
-          </Button>
           <Select
             showSearch
             style={{ width: 200 }}
             placeholder="Select background"
             optionFilterProp="children"
             onChange={this.onChange}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onSearch={onSearch}
             filterOption={(input, option) =>
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
@@ -63,6 +65,9 @@ class ContainedButtons extends Component {
             <Option value={Bg4}>Background-4</Option>
             <Option value={Bg5}>Background-5</Option>
           </Select>
+          <Button type="primary" icon={<DownloadOutlined />} size={size}>
+            Download
+          </Button>
         </Space>
         <div className="imgPreview">
           <img

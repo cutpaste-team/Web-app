@@ -8,7 +8,7 @@
 }
 .imgPreview .picture {
   position: absolute;
-  top: 100px;
+  bottom: 100px;
   left: 150px;
 }
 .ant-upload-list-item {

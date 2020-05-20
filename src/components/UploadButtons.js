@@ -27,14 +27,8 @@ class UploadButtons extends Component {
   }
   // Event handler when image is chosen
   handleChange(event) {
-    const openNotificationWithIcon = (type) => {
-      notification[type]({
-        message: "Notification",
-        description: "Uploaded success",
-      });
-    };
     this.setState({ uploadButton: true });
-    openNotificationWithIcon("success");
+
     const file = event.target.files[0];
     // If the image upload is cancelled
     if (!file) {
@@ -64,6 +58,13 @@ class UploadButtons extends Component {
     axios
       .post("http://19c1d9e0.ngrok.io/upload", formData, config)
       .then(function (response) {
+        const openNotificationWithIcon = (type) => {
+          notification[type]({
+            message: "Notification",
+            description: "Uploaded success",
+          });
+        };
+        openNotificationWithIcon("success");
         console.log(response);
       })
       .catch(function (error) {
