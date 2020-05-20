@@ -20,7 +20,7 @@ class ContainedButtons extends Component {
     this.downloadImg = this.downloadImg.bind(this);
   }
   downloadImg() {
-    fetch("localhost:5000/download", {
+    fetch("http://localhost:5000/download", {
       method: "GET",
       headers: {},
     })
@@ -43,7 +43,7 @@ class ContainedButtons extends Component {
     this.setState({
       url: value,
     });
-    const file = value;
+    /*const file = value;
     const formData = new FormData();
     formData.append("file", file);
     for (var value of formData.values()) {
@@ -51,11 +51,15 @@ class ContainedButtons extends Component {
     }
     const config = {
       headers: {
-        "Contetnt-Type": "multipart/form-data",
+        "Content-Type": "multipart/form-data",
       },
     };
+    */
+    var params = {
+      data:value
+    }
     axios
-      .post("localhost:5000/merge", formData, config)
+      .post("http://localhost:5000/merge", params)
       .then(function (response) {
         console.log(response);
       })
