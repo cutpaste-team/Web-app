@@ -67,39 +67,49 @@ def run(img):
     torch.cuda.empty_cache()
     img_BGRA = None
     with torch.no_grad():
-        sample = preprocess_img(img)
-        inputs_test = sample['image'].unsqueeze(0)
-        inputs_test = inputs_test.type(torch.FloatTensor)
+      sample = preprocess_img(img)
+      inputs_test = sample['image'].unsqueeze(0)
+      inputs_test = inputs_test.type(torch.FloatTensor)
 
-        if torch.cuda.is_available():
-            inputs_test = Variable(inputs_test.cuda())
-        else:
-            inputs_test = Variable(inputs_test)
+      if torch.cuda.is_available():
+          inputs_test = Variable(inputs_test.cuda())
+      else:
+          inputs_test = Variable(inputs_test)
 
-        d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
+      d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
 
-        # normalization
-        pred = d1[:,0,:,:]
-        pred = normPRED(pred)
+      # normalization
+      pred = d1[:,0,:,:]
+      pred = normPRED(pred)
 
-        predict = pred
-        predict = predict.squeeze()
-        predict_np = predict.cpu().data.numpy()
+      predict = pred
+      predict = predict.squeeze()
+      predict_np = predict.cpu().data.numpy()
 
-        im = Image.fromarray(predict_np*255).convert('RGB')
-        imo = np.array(im.resize((img.shape[1],img.shape[0]),resample=Image.BILINEAR))
+      im = Image.fromarray(predict_np*255).convert('RGB')
+      imo = np.array(im.resize((img.shape[1],img.shape[0]),resample=Image.BILINEAR))
 
-        del d1,d2,d3,d4,d5,d6,d7
-        mask = np.greater(imo, 0.5*255)
-        crops = img*mask
+      del d1,d2,d3,d4,d5,d6,d7
+      mask = imo.mean(axis=2)
+      bmask = (mask >= 200)
+      rows_with_white = np.max(bmask, axis=1)
+      cols_with_white = np.max(bmask, axis=0)
+      row_low = np.argmax(rows_with_white)
+      row_high = len(rows_with_white) -np.argmax(rows_with_white[::-1])
+      col_low = np.argmax(cols_with_white)
+      col_high = len(cols_with_white) -np.argmax(cols_with_white[::-1])
+      if (row_high == 0):
+        row_high = -1
+      if (col_high == 0):
+        col_high = -col_low
+      im_cropped = Image.fromarray(img[row_low:row_high, col_low:col_high])
+      m = Image.fromarray(imo[row_low:row_high, col_low:col_high]).convert("L")
+      empty = Image.new("RGBA",im_cropped.size, 0)
 
-        tmp = cv2.cvtColor(crops, cv2.COLOR_BGR2GRAY)
-        ret, alpha = cv2.threshold(tmp,0,255,cv2.THRESH_BINARY)
-        b_channel, g_channel, r_channel = cv2.split(crops)
-        img_BGRA = cv2.merge((b_channel, g_channel, r_channel, alpha))
-        print("RESULT", img_BGRA.shape)
-    return Image.fromarray(img_BGRA)
+      removed_background = Image.composite(im_cropped, empty, m)
+      removed_background
 
+    return removed_background
 
 app = Flask(__name__, instance_relative_config=True)
 
@@ -209,3 +219,4 @@ def get_cut_img():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
+
