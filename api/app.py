@@ -222,7 +222,7 @@ def download():
 
     filename = CUT_FILE
     file_dict = {}
-    if last_bg != 0:
+    if last_bg != "":
         bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_bg))
         obj = Image.open(CUT_FOLDER+filename+".PNG")
         bg.paste(obj, (700,300),mask=obj)
@@ -231,6 +231,7 @@ def download():
         file_dict = cloudinary.uploader.upload(save_path)
     else:
         save_path = CUT_FOLDER+filename+".PNG"
+        print(save_path)
         file_dict = cloudinary.uploader.upload(save_path)
     return file_dict["secure_url"]
 if __name__ == '__main__':
