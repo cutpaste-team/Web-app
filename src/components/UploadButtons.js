@@ -56,7 +56,7 @@ class UploadButtons extends Component {
       },
     };
     axios
-      .post("http://19c1d9e0.ngrok.io/upload", formData, config)
+      .post("http://127.0.0.1:5000/upload", formData, config)
       .then(function (response) {
         const openNotificationWithIcon = (type) => {
           notification[type]({

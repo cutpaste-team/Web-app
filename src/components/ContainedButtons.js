@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { Button, Select, Space } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
+import { Button, Radio } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { CopyOutlined } from '@ant-design/icons';
 import "./css/Upload.css";
 import Bg1 from "../images/Bg-1.png";
 import Bg2 from "../images/Bg-2.png";
