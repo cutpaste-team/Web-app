@@ -21,19 +21,26 @@ class ContainedButtons extends Component {
   }
   downloadImg() {
     axios
-      .get("http://localhost:5000/download", {
-        responseType: "arraybuffer",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      .get("http://localhost:5000/download")
       .then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "file.pdf"); //or any other extension
-        document.body.appendChild(link);
-        link.click();
+        console.log(response.data);
+        fetch(response.data, {
+          method: "GET",
+          headers: {}
+        })
+          .then(response => {
+            response.arrayBuffer().then(function(buffer) {
+              const url = window.URL.createObjectURL(new Blob([buffer]));
+              const link = document.createElement("a");
+              link.href = url;
+              link.setAttribute("download", "image.png"); //or any other extension
+              document.body.appendChild(link);
+              link.click();
+            });
+          })
+          .catch(err => {
+            console.log(err);
+          });
       })
       .catch((error) => console.log(error));
   }
