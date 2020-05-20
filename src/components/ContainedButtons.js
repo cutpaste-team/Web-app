@@ -33,10 +33,10 @@ class ContainedButtons extends Component {
         console.log(response.data);
         fetch(response.data, {
           method: "GET",
-          headers: {}
+          headers: {},
         })
-          .then(response => {
-            response.arrayBuffer().then(function(buffer) {
+          .then((response) => {
+            response.arrayBuffer().then(function (buffer) {
               const url = window.URL.createObjectURL(new Blob([buffer]));
               const link = document.createElement("a");
               link.href = url;
@@ -45,7 +45,7 @@ class ContainedButtons extends Component {
               link.click();
             });
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
           });
       })
@@ -94,7 +94,7 @@ class ContainedButtons extends Component {
   render() {
     const size = "default";
     const { Option } = Select;
-    const { axisX, axisY, sizeImage } = this.state;
+    const { axisX, axisY, sizeImage, url } = this.state;
     return (
       <div className="dowload-paste">
         <Space>
@@ -125,8 +125,16 @@ class ContainedButtons extends Component {
             Download
           </Button>
         </Space>
-        <div className="imgPreview">
-          <img className="background" src={this.state.url} alt="" />
+        <div
+          className="imgPreview"
+          style={{
+            backgroundImage: `url( ${url})`,
+            background: "cover",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+          }}
+        >
           <img
             className="picture"
             src={this.props.images}

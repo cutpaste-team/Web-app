@@ -11,7 +11,6 @@ class UploadButtons extends Component {
     super();
     this.state = {
       previewImageUrl: false,
-      imageHeight: 200,
       imagePrediction: "",
       uploadButton: false,
     };
@@ -104,17 +103,24 @@ class UploadButtons extends Component {
             </IconButton>
           </label>
         </div>
-        <div className="imgPreview">
-          {this.state.previewImageUrl && (
+        <div
+          className="imgPreview"
+          style={{
+            backgroundImage: `url( ${this.state.previewImageUrl})`,
+            background: "cover",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+          }}
+        >
+          {/* {this.state.previewImageUrl && (
             <img
               className="preivew"
               height={this.state.imageHeight}
               alt=""
               src={this.state.previewImageUrl}
-              width={280}
-              height={270}
             />
-          )}
+          )} */}
         </div>
       </div>
     );

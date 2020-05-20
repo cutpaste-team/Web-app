@@ -19,12 +19,10 @@ export default class Body extends Component {
   }
   async getDatas() {
     try {
-      const dataImage = await axios.get(
-        "http://localhost:5000/get-cut-image"
-      );
+      const dataImage = await axios.get("http://localhost:5000/get-cut-image");
       this.setState({
-          images: dataImage.data,
-        });
+        images: dataImage.data,
+      });
       console.log(this.state.images);
     } catch (error) {
       console.log(error);
@@ -37,17 +35,13 @@ export default class Body extends Component {
   render() {
     return (
       <div className="Body">
-            
-            <div>
-              <UploadButtons></UploadButtons>
-              <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
-            </div>
-            
-           
-            <div>
-              <ContainedButtons images={this.state.images}/>
-              </div>
-            
+        <div>
+          <UploadButtons></UploadButtons>
+          <LinearDeterminate onclick={this.getDatas}></LinearDeterminate>
+        </div>
+        <div>
+          <ContainedButtons images={this.state.images} />
+        </div>
       </div>
     );
   }
