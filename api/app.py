@@ -2,27 +2,13 @@ import io, traceback
 
 from flask import Flask, request, g
 from flask import send_file,make_response,send_from_directory
-from flask_mako import MakoTemplates, render_template
-from plim import preprocessor
+from processing import run, preprocess_img, predict
 
 from PIL import Image
 import numpy as np
 import cv2
-
-from skimage import transform
 import torch
 import torchvision
-from torch.autograd import Variable
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms#, utils
-# import torch.optim as optim
-
-from data_loader import RescaleT
-from data_loader import ToTensor
-from data_loader import ToTensorLab
-from data_loader import SalObjDataset
 
 from model import U2NET # full size version 173.6 MB
 from model import U2NETP # small version u2net 4.7 MB
@@ -34,81 +20,9 @@ import json
 import cloudinary
 import cloudinary.uploader
 
-# normalize the predicted SOD probability map
-def normPRED(d):
-    ma = torch.max(d)
-    mi = torch.min(d)
-
-    dn = (d-mi)/(ma-mi)
-
-    return dn
-
-def preprocess_img(image):
-    label_3 = np.zeros(image.shape)
-    label = np.zeros(label_3.shape[0:2])
-
-    if (3 == len(label_3.shape)):
-        label = label_3[:, :, 0]
-    elif (2 == len(label_3.shape)):
-        label = label_3
-
-    if (3 == len(image.shape) and 2 == len(label.shape)):
-        label = label[:, :, np.newaxis]
-    elif (2 == len(image.shape) and 2 == len(label.shape)):
-        image = image[:, :, np.newaxis]
-        label = label[:, :, np.newaxis]
-
-    transform = transforms.Compose([RescaleT(320), ToTensorLab(flag=0)])
-    sample = transform({'imidx': np.array([0.]),'image': image, 'label': label})
-
-    return sample
-
-def run(img):
-    torch.cuda.empty_cache()
-    img_BGRA = None
-    with torch.no_grad():
-      sample = preprocess_img(img)
-      inputs_test = sample['image'].unsqueeze(0)
-      inputs_test = inputs_test.type(torch.FloatTensor)
-
-      if torch.cuda.is_available():
-          inputs_test = Variable(inputs_test.cuda())
-      else:
-          inputs_test = Variable(inputs_test)
-
-      d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
-
-      # normalization
-      pred = d1[:,0,:,:]
-      pred = normPRED(pred)
-
-      predict = pred
-      predict = predict.squeeze()
-      predict_np = predict.cpu().data.numpy()
-
-      im = Image.fromarray(predict_np*255).convert('RGB')
-      imo = np.array(im.resize((img.shape[1],img.shape[0]),resample=Image.BILINEAR))
-
-      del d1,d2,d3,d4,d5,d6,d7
-      mask = imo.mean(axis=2)
-      bmask = (mask >= 200)
-      rows_with_white = np.max(bmask, axis=1)
-      cols_with_white = np.max(bmask, axis=0)
-      row_low = np.argmax(rows_with_white)
-      row_high = len(rows_with_white) -np.argmax(rows_with_white[::-1])
-      col_low = np.argmax(cols_with_white)
-      col_high = len(cols_with_white) -np.argmax(cols_with_white[::-1])
-
-      im_cropped = Image.fromarray(img[row_low:row_high, col_low:col_high])
-      m = Image.fromarray(imo[row_low:row_high, col_low:col_high]).convert("L")
-      empty = Image.new("RGBA",im_cropped.size, 0)
-
-      removed_background = Image.composite(im_cropped, empty, m)
-      removed_background
-
-    return removed_background
 
 app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config.ProductionConfig')
 
 # For Plim templates
 # Allow 
@@ -128,14 +42,13 @@ cloudinary.config(
 
 # Allowed file extransions
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-app.config.from_object('config.ProductionConfig')
 
 BACKGROUND = []
 BACKGROUND_FOLDER = "uploads/background/"
 PROCESS_FOLDER = "uploads/process_images/"
 
 print("Loading model")
-model_name='u2netp'#u2netp
+model_name='u2net'#u2netp
 model_dir = './saved_models/'+ model_name + '/' + model_name + '.pth'
 
 if(model_name=='u2net'):
@@ -149,13 +62,6 @@ if torch.cuda.is_available():
     net.cuda()
 net.eval()
 
-def predict(img_path):
-    # Load image
-    print("PREDICTING")
-    image = np.array(Image.open(img_path))
-    img_BGRA = run(image)
-
-    return img_BGRA
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -184,7 +90,7 @@ def upload_file():
             print("SAVING FILE",UPLOAD_FOLDER, filename)
             img_path = UPLOAD_FOLDER+filename
             file.save(img_path)
-            img_BGRA = predict(img_path)
+            img_BGRA = predict(net, img_path)
 
             filename = "".join(filename.split("."))
 
@@ -234,6 +140,8 @@ def download():
         print(save_path)
         file_dict = cloudinary.uploader.upload(save_path)
     return file_dict["secure_url"]
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
 
