@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Button, Radio } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
-import { CopyOutlined } from '@ant-design/icons';
+import { Button, Select, Space } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
 import "./css/Upload.css";
 import Bg1 from "../images/Bg-1.png";
 import Bg2 from "../images/Bg-2.png";
@@ -17,6 +16,27 @@ class ContainedButtons extends Component {
       url: "",
     };
     this.onChange = this.onChange.bind(this);
+    this.downloadImg = this.downloadImg.bind(this);
+  }
+  downloadImg() {
+    fetch("localhost:5000/download", {
+      method: "GET",
+      headers: {},
+    })
+      .then((res) => {
+        res.arrayBuffer().then(function (buffer) {
+          const url = window.URL.createObjectURL(new Blob([buffer]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.png"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
   onChange(value) {
     this.setState({
@@ -59,14 +79,19 @@ class ContainedButtons extends Component {
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
           >
-            <Option value="jack">None</Option>
+            <Option value="">None</Option>
             <Option value={Bg1}>Background-1</Option>
             <Option value={Bg2}>Background-2</Option>
             <Option value={Bg3}>Background-3</Option>
             <Option value={Bg4}>Background-4</Option>
             <Option value={Bg5}>Background-5</Option>
           </Select>
-          <Button type="primary" icon={<DownloadOutlined />} size={size}>
+          <Button
+            type="primary"
+            icon={<DownloadOutlined />}
+            size={size}
+            onClick={this.downloadImg}
+          >
             Download
           </Button>
         </Space>
