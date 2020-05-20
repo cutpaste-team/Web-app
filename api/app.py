@@ -5,7 +5,7 @@ from flask import send_file,make_response,send_from_directory
 from flask_mako import MakoTemplates, render_template
 from plim import preprocessor
 
-from PIL import Image, ExifTags
+from PIL import Image
 import numpy as np
 import cv2
 
@@ -98,10 +98,7 @@ def run(img):
       row_high = len(rows_with_white) -np.argmax(rows_with_white[::-1])
       col_low = np.argmax(cols_with_white)
       col_high = len(cols_with_white) -np.argmax(cols_with_white[::-1])
-      if (row_high == 0):
-        row_high = -1
-      if (col_high == 0):
-        col_high = -col_low
+
       im_cropped = Image.fromarray(img[row_low:row_high, col_low:col_high])
       m = Image.fromarray(imo[row_low:row_high, col_low:col_high]).convert("L")
       empty = Image.new("RGBA",im_cropped.size, 0)
@@ -131,13 +128,11 @@ cloudinary.config(
 
 # Allowed file extransions
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-CUT_FILE= None
-#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-#app.config['CUT_FOLDER'] = CUT_FOLDER
-
-mako = MakoTemplates(app)
-app.config['MAKO_PREPROCESSOR'] = preprocessor
 app.config.from_object('config.ProductionConfig')
+
+BACKGROUND = []
+BACKGROUND_FOLDER = "uploads/background/"
+PROCESS_FOLDER = "uploads/process_images/"
 
 print("Loading model")
 model_name='u2netp'#u2netp
@@ -203,20 +198,41 @@ def upload_file():
 def get_cut_img():
     if CUT_FILE:
         #return json.dumps(CUT_FILE)
-        """
-
-        response = make_response(send_file(CUT_FILE,mimetype='image/png'))
-        response.headers['Content-Transfer-Encoding']='base64'
-        """
-
         file_dict = cloudinary.uploader.upload(CUT_FOLDER+CUT_FILE+".PNG")
-        file_dict["secure_url"]
         print(CUT_FILE)
 
         return file_dict["secure_url"]
     else:
         return "Cannot cut the image"
 
+@app.route('/merge',methods=["GET","POST"])
+def find_bg():
+    data = request.get_json()
+    query = data["data"]
+    global BACKGROUND
+    if query != "": 
+        BACKGROUND.append(query.split("/")[-1].split(".")[0]+".png")
+    else:
+        BACKGROUND.append("")
+    return "success"
+
+@app.route('/download', methods=["GET"]) 
+def download():
+    last_bg = BACKGROUND[-1]
+
+    filename = CUT_FILE
+    file_dict = {}
+    if last_bg != 0:
+        bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_bg))
+        obj = Image.open(CUT_FOLDER+filename+".PNG")
+        bg.paste(obj, (700,300),mask=obj)
+        save_path = PROCESS_FOLDER+filename+".png"
+        bg.save(save_path)
+        file_dict = cloudinary.uploader.upload(save_path)
+    else:
+        save_path = CUT_FOLDER+filename+".PNG"
+        file_dict = cloudinary.uploader.upload(save_path)
+    return file_dict["secure_url"]
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
 

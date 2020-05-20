@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button, Select, Space } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
+import { CopyOutlined } from "@ant-design/icons";
 import "./css/Upload.css";
 import Bg1 from "../images/Bg-1.png";
 import Bg2 from "../images/Bg-2.png";
@@ -30,7 +31,7 @@ class ContainedButtons extends Component {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "image.png"); //or any other extension
+        link.setAttribute("download", "file.pdf"); //or any other extension
         document.body.appendChild(link);
         link.click();
       })
@@ -40,19 +41,11 @@ class ContainedButtons extends Component {
     this.setState({
       url: value,
     });
-    const file = value;
-    const formData = new FormData();
-    formData.append("file", file);
-    for (var value of formData.values()) {
-      console.log(value);
-    }
-    const config = {
-      headers: {
-        "Contetnt-Type": "multipart/form-data",
-      },
+    var params = {
+      data: value,
     };
     axios
-      .post("localhost:5000/merge", formData, config)
+      .post("http://localhost:5000/merge", params)
       .then(function (response) {
         console.log(response);
       })
