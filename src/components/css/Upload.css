@@ -39,3 +39,13 @@
   width: 30em;
   height: 200px;
 }
+input[type="file"] {
+  display: none;
+}
+.custom-file-upload {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 5px 10px;
+  cursor: pointer;
+}

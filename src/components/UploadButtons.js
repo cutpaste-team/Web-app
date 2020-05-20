@@ -74,14 +74,10 @@ class UploadButtons extends Component {
   render() {
     return (
       <div>
-        <input
-          accept="image/*"
-          id="contained-button-file"
-          multiple
-          type="file"
-          onChange={this.handleChange}
-        />
-
+        <label for="file-upload" class="custom-file-upload">
+          <i class="fa fa-cloud-upload"></i> Choose file for cut
+        </label>
+        <input id="file-upload" type="file" onChange={this.handleChange} />
         <div className="upload-icon">
           {this.state.uploadButton && (
             <Button
@@ -112,16 +108,7 @@ class UploadButtons extends Component {
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
           }}
-        >
-          {/* {this.state.previewImageUrl && (
-            <img
-              className="preivew"
-              height={this.state.imageHeight}
-              alt=""
-              src={this.state.previewImageUrl}
-            />
-          )} */}
-        </div>
+        ></div>
       </div>
     );
   }
