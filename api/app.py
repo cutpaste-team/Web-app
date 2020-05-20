@@ -114,7 +114,6 @@ def get_cut_img():
 @app.route('/merge',methods=["GET","POST"])
 def find_bg():
     data = request.get_json()
-    query = data["url"]
     global PROCESS_CONFIG
     PROCESS_CONFIG["url"] = data["url"].split("/")[-1].split(".")[0]+".png"
     PROCESS_CONFIG["sizeImage"] = data["sizeImage"]
@@ -129,15 +128,23 @@ def download():
     last_query = PROCESS_CONFIG
     filename = CUT_FILE
     file_dict = {}
+    
+    bg_height = 1650
+    bg_width = 1275
+    frame_height = 576
+    frame_width =  480
+    ratioX = bg_width / frame_width 
+    ratioY = bg_height / frame_height 
 
-    axisX = last_query["axisX"]
-    axisY = last_query["axisY"]
+    axisX = last_query["axisX"] / 100
+    axisY = last_query["axisY"] / 100
+    print(axisX,axisY)
     factor = last_query["sizeImage"] / 100
     obj = Image.open(CUT_FOLDER+filename+".PNG")
-    obj = obj.resize((int(obj.size[0]*factor),int(obj.size[1]*factor)),resample=Image.BILINEAR)
-    if last_query["url"] != "":
+    obj = obj.resize((int(obj.size[0]*factor*ratioX),int(obj.size[1]*factor*ratioY)),resample=Image.ANTIALIAS)
+    if last_query["url"] != ".png":
         bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_query["url"]))
-        bg.paste(obj, (axisX,axisY),mask=obj)
+        bg.paste(obj, (int(bg_width*axisX),int(bg_height - bg_height*axisY-obj.size[1])),mask=obj)
 
         save_path = PROCESS_FOLDER+filename+".png"
         bg.save(save_path)
