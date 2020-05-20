@@ -43,12 +43,12 @@ cloudinary.config(
 # Allowed file extransions
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-BACKGROUND = []
+PROCESS_CONFIG = {}
 BACKGROUND_FOLDER = "uploads/background/"
 PROCESS_FOLDER = "uploads/process_images/"
 
 print("Loading model")
-model_name='u2net'#u2netp
+model_name='u2netp'#u2netp
 model_dir = './saved_models/'+ model_name + '/' + model_name + '.pth'
 
 if(model_name=='u2net'):
@@ -114,34 +114,41 @@ def get_cut_img():
 @app.route('/merge',methods=["GET","POST"])
 def find_bg():
     data = request.get_json()
-    query = data["data"]
-    global BACKGROUND
-    if query != "": 
-        BACKGROUND.append(query.split("/")[-1].split(".")[0]+".png")
-    else:
-        BACKGROUND.append("")
+    query = data["url"]
+    global PROCESS_CONFIG
+    PROCESS_CONFIG["url"] = data["url"].split("/")[-1].split(".")[0]+".png"
+    PROCESS_CONFIG["sizeImage"] = data["sizeImage"]
+    PROCESS_CONFIG["axisX"] = data["axisX"]
+    PROCESS_CONFIG["axisY"] = data["axisY"]
+    print("PROCESS_CONFIG",PROCESS_CONFIG)
     return "success"
+
 
 @app.route('/download', methods=["GET"]) 
 def download():
-    last_bg = BACKGROUND[-1]
-
+    last_query = PROCESS_CONFIG
     filename = CUT_FILE
     file_dict = {}
-    if last_bg != "":
-        bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_bg))
-        obj = Image.open(CUT_FOLDER+filename+".PNG")
-        bg.paste(obj, (700,300),mask=obj)
+
+    axisX = last_query["axisX"]
+    axisY = last_query["axisY"]
+    factor = last_query["sizeImage"] / 100
+    obj = Image.open(CUT_FOLDER+filename+".PNG")
+    obj = obj.resize((int(obj.size[0]*factor),int(obj.size[1]*factor)),resample=Image.BILINEAR)
+    if last_query["url"] != "":
+        bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_query["url"]))
+        bg.paste(obj, (axisX,axisY),mask=obj)
+
         save_path = PROCESS_FOLDER+filename+".png"
         bg.save(save_path)
         file_dict = cloudinary.uploader.upload(save_path)
     else:
         save_path = CUT_FOLDER+filename+".PNG"
-        print(save_path)
         file_dict = cloudinary.uploader.upload(save_path)
+    
     return file_dict["secure_url"]
-
+    
+    #return "success"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
-
