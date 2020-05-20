@@ -4,7 +4,7 @@ import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import "./css/Upload.css";
 import React, { Component } from "react";
 import axios from "axios";
-import { notification, Space } from "antd";
+import { notification } from "antd";
 
 class UploadButtons extends Component {
   constructor() {
