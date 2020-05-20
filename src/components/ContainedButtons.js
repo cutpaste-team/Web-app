@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Select, Space } from "antd";
+import { Button, Select, Space, Slider } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { CopyOutlined } from "@ant-design/icons";
 import "./css/Upload.css";
@@ -15,9 +15,16 @@ class ContainedButtons extends Component {
     super(props);
     this.state = {
       url: "",
+      sizeImage: 100,
+      axisX: 0,
+      axisY: 0,
     };
     this.onChange = this.onChange.bind(this);
     this.downloadImg = this.downloadImg.bind(this);
+    this.formatter = this.formatter.bind(this);
+    this.onChangeSlider = this.onChangeSlider.bind(this);
+    this.onChangeSliderX = this.onChangeSliderX.bind(this);
+    this.onChangeSliderY = this.onChangeSliderY.bind(this);
   }
   downloadImg() {
     axios
@@ -41,11 +48,17 @@ class ContainedButtons extends Component {
     this.setState({
       url: value,
     });
-    var params = {
-      data: value,
+  }
+  componentDidUpdate() {
+    const { url, sizeImage, axisX, axisY } = this.state;
+    var data = {
+      url: url,
+      sizeImage: sizeImage,
+      axisX: axisX,
+      axisY: axisY,
     };
     axios
-      .post("http://localhost:5000/merge", params)
+      .post("http://localhost:5000/merge", data)
       .then(function (response) {
         console.log(response);
       })
@@ -53,9 +66,28 @@ class ContainedButtons extends Component {
         console.log(error);
       });
   }
+  formatter(value) {
+    return `${value}%`;
+  }
+  onChangeSlider(value) {
+    this.setState({
+      sizeImage: value,
+    });
+  }
+  onChangeSliderX(value) {
+    this.setState({
+      axisX: value,
+    });
+  }
+  onChangeSliderY(value) {
+    this.setState({
+      axisY: value,
+    });
+  }
   render() {
     const size = "default";
     const { Option } = Select;
+    const { axisX, axisY, sizeImage } = this.state;
     return (
       <div className="dowload-paste">
         <Space>
@@ -87,20 +119,35 @@ class ContainedButtons extends Component {
           </Button>
         </Space>
         <div className="imgPreview">
-          <img
-            className="background"
-            src={this.state.url}
-            width={280}
-            height={270}
-            alt=""
-          />
+          <img className="background" src={this.state.url} alt="" />
           <img
             className="picture"
             src={this.props.images}
-            width={100}
-            height={100}
-            alt=""
+            style={{
+              width: `${sizeImage}%`,
+              left: `${axisX}%`,
+              bottom: `${axisY}%`,
+            }}
           />
+        </div>
+        <div className="boxSlider">
+          <h4>Adjust</h4>
+          <Slider
+            tipFormatter={this.formatter}
+            defaultValue={100}
+            onChange={this.onChangeSlider}
+          >
+            {" "}
+            Size
+          </Slider>
+          <Slider tipFormatter={this.formatter} onChange={this.onChangeSliderX}>
+            {" "}
+            X
+          </Slider>
+          <Slider tipFormatter={this.formatter} onChange={this.onChangeSliderY}>
+            {" "}
+            Y
+          </Slider>
         </div>
       </div>
     );

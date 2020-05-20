@@ -107,6 +107,7 @@ class UploadButtons extends Component {
         <div className="imgPreview">
           {this.state.previewImageUrl && (
             <img
+              className="preivew"
               height={this.state.imageHeight}
               alt=""
               src={this.state.previewImageUrl}
