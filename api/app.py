@@ -48,7 +48,7 @@ BACKGROUND_FOLDER = "uploads/background/"
 PROCESS_FOLDER = "uploads/process_images/"
 
 print("Loading model")
-model_name='u2netp'#u2netp
+model_name='u2net'#u2netp
 model_dir = './saved_models/'+ model_name + '/' + model_name + '.pth'
 
 if(model_name=='u2net'):
@@ -119,7 +119,6 @@ def find_bg():
     PROCESS_CONFIG["sizeImage"] = data["sizeImage"]
     PROCESS_CONFIG["axisX"] = data["axisX"]
     PROCESS_CONFIG["axisY"] = data["axisY"]
-    print("PROCESS_CONFIG",PROCESS_CONFIG)
     return "success"
 
 
@@ -136,18 +135,28 @@ def download():
     ratioX = bg_width / frame_width 
     ratioY = bg_height / frame_height 
 
+    #ratioX = frame_width/bg_width 
+    #ratioY = frame_height/bg_height 
+    quality_val = 95
+
+
     axisX = last_query["axisX"] / 100
     axisY = last_query["axisY"] / 100
-    print(axisX,axisY)
     factor = last_query["sizeImage"] / 100
     obj = Image.open(CUT_FOLDER+filename+".PNG")
-    obj = obj.resize((int(obj.size[0]*factor*ratioX),int(obj.size[1]*factor*ratioY)),resample=Image.ANTIALIAS)
+    print("ORIGINAL SIZE", obj.size)
+    obj = obj.resize((int(obj.size[0]*factor),int(obj.size[1]*factor)),resample=Image.ANTIALIAS)
     if last_query["url"] != ".png":
         bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_query["url"]))
-        bg.paste(obj, (int(bg_width*axisX),int(bg_height - bg_height*axisY-obj.size[1])),mask=obj)
+        bg_width, bg_height = bg.size
+        print(np.array(bg).shape)
+        bg = bg.resize((int(frame_width),int(frame_height)),resample=Image.ANTIALIAS)
+        print(obj.size, bg.size)
+        bg.paste(obj, (int(frame_width*axisX),int(frame_height - frame_height*axisY-obj.size[1])),mask=obj)
+        bg = bg.resize((int(bg_width),int(bg_height)),resample=Image.ANTIALIAS)
 
         save_path = PROCESS_FOLDER+filename+".png"
-        bg.save(save_path)
+        bg.save(save_path,quality = quality_val)
         file_dict = cloudinary.uploader.upload(save_path)
     else:
         save_path = CUT_FOLDER+filename+".PNG"
