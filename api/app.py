@@ -48,7 +48,7 @@ BACKGROUND_FOLDER = "uploads/background/"
 PROCESS_FOLDER = "uploads/process_images/"
 
 print("Loading model")
-model_name='u2netp'#u2netp
+model_name='u2net'#u2netp
 model_dir = './saved_models/'+ model_name + '/' + model_name + '.pth'
 
 if(model_name=='u2net'):
