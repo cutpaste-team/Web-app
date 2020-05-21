@@ -93,7 +93,11 @@ def upload_file():
             img_BGRA = predict(net, img_path)
 
             filename = "".join(filename.split("."))
-
+            """
+            frame_height = 576
+            frame_width =  480
+            img_BGRA = img_BGRA.resize((int(frame_width),int(frame_height)),resample=Image.ANTIALIAS)
+            """
             global CUT_FILE 
             img_BGRA.save(CUT_FOLDER+filename+".PNG")
             CUT_FILE = filename
@@ -125,11 +129,12 @@ def find_bg():
 @app.route('/download', methods=["GET"]) 
 def download():
     last_query = PROCESS_CONFIG
+    print("LAST",last_query)
     filename = CUT_FILE
     file_dict = {}
     
-    bg_height = 1650
-    bg_width = 1275
+    bg_height = 960
+    bg_width = 742
     frame_height = 576
     frame_width =  480
     ratioX = bg_width / frame_width 
@@ -145,7 +150,7 @@ def download():
     factor = last_query["sizeImage"] / 100
     obj = Image.open(CUT_FOLDER+filename+".PNG")
     print("ORIGINAL SIZE", obj.size)
-    obj = obj.resize((int(obj.size[0]*factor),int(obj.size[1]*factor)),resample=Image.ANTIALIAS)
+    obj = obj.resize((int(obj.size[0]*factor/ratioX),int(obj.size[1]*factor/ratioY)),resample=Image.ANTIALIAS)
     if last_query["url"] != ".png":
         bg = Image.open(os.path.join(BACKGROUND_FOLDER,last_query["url"]))
         bg_width, bg_height = bg.size
@@ -153,7 +158,7 @@ def download():
         bg = bg.resize((int(frame_width),int(frame_height)),resample=Image.ANTIALIAS)
         print(obj.size, bg.size)
         bg.paste(obj, (int(frame_width*axisX),int(frame_height - frame_height*axisY-obj.size[1])),mask=obj)
-        bg = bg.resize((int(bg_width),int(bg_height)),resample=Image.ANTIALIAS)
+        #bg = bg.resize((int(bg_width),int(bg_height)),resample=Image.ANTIALIAS)
 
         save_path = PROCESS_FOLDER+filename+".png"
         bg.save(save_path,quality = quality_val)
