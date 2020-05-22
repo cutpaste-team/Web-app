@@ -15,7 +15,7 @@
 ```cd api/```
 
 Install torch and torchvision separately
-```pip install torch torchvision no-cache-dir```
+```pip install torch torchvision --no-cache-dir```
 
 Install the rest of the package:
 ```pip install -r requirements.txt```
